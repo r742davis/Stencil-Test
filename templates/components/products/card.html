@@ -26,11 +26,20 @@
                     default_image=theme_settings.default_image_product
                 }}
             </div>
+            {{#each (limit images 2)}}
+            {{#if @index '>' 0}}
+                <img class="card-image-hover" src="{{getImage this 'productgallery_size' (cdn theme_settings.default_image_product)}}" alt="{{this.alt}}" title="{{this.alt}}">
+            {{/if}}
+            {{/each}}
         </a>
-
+        
         <figcaption class="card-figcaption">
             <div class="card-figcaption-body">
-                {{#unless hide_product_quick_view}}
+                
+                <!-- <a href="{{url}}" {{#if settings.data_tag_enabled}} data-event-type="product-click" {{/if}}>
+                    
+                </a> -->
+                <!-- {{#unless hide_product_quick_view}}
                     {{#if theme_settings.show_product_quick_view}}
                         {{#if settings.data_tag_enabled}}
                             <a class="button button--small card-figcaption-button quickview" data-event-type="product-click" data-product-id="{{id}}">{{lang 'products.quick_view'}}</a>
@@ -59,7 +68,7 @@
                             <a href="{{url}}" data-event-type="product-click" class="button button--small card-figcaption-button" data-product-id="{{id}}">{{out_of_stock_message}}</a>
                         {{/if}}
                     {{/if}}
-                {{/or}}
+                {{/or}} -->
             </div>
         </figcaption>
     </figure>

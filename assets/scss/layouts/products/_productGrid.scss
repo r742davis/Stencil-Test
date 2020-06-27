@@ -96,7 +96,7 @@
 // Product grid view variation
 // -----------------------------------------------------------------------------
 
-.productGrid--maxCol6 {
+.--maxCol6 {
     .no-csscolumns & {
         // scss-lint:disable SelectorDepth, NestingDepth
         .product {
@@ -113,7 +113,7 @@
     }
 }
 
-.productGrid--maxCol3 {
+.--maxCol3 {
     .no-csscolumns & {
         // scss-lint:disable SelectorDepth, NestingDepth
         .product {

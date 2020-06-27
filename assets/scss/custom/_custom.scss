@@ -1,0 +1,27 @@
+// .card-figure-custom {
+//   margin-top: $card-figure-marginTop;
+//   position: relative;
+//   &:hover {
+
+//     .card-secondary-img {
+//         opacity: 1;
+//     }
+
+//   }
+// }
+
+// .card-figcaption-custom {
+//     display: none;
+//     margin: $card-figcaption-margin;
+//     pointer-events: none; // 1
+
+//     @include breakpoint("medium") {
+//       display: block;
+//     }
+// }
+
+// .card-figcaption-body-custom {
+//   display: $card-figcaption-body-display;
+//   pointer-events: all; // 1
+//   transform: translate3d(0, -50%, 0); // 2
+// }
