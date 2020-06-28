@@ -1,6 +1,20 @@
 {{> components/products/filter sort=pagination.category.sort}}
 
-<form action="{{urls.compare}}" method='POST' {{#if settings.data_tag_enabled}} data-list-name="Category: {{category.name}}" {{/if}} data-product-compare>
+
+<button 
+    id="addAllToCart"
+    class="button button--primary" 
+    type="submit"
+    data-wait-message="Adding all items from {{category.name}} to cart..." 
+    >Add All To Cart</button>
+
+<form 
+    action="{{urls.compare}}" 
+    method='POST' 
+    {{#if settings.data_tag_enabled}} 
+        data-list-name="Category: {{category.name}}" 
+    {{/if}} 
+    data-product-compare>
     {{#if theme_settings.product_list_display_mode '===' 'grid'}}
         {{#if settings.data_tag_enabled}}
             {{> components/products/grid products=category.products show_compare=category.show_compare theme_settings=theme_settings event="list" }}
@@ -17,3 +31,17 @@
 </form>
 
 {{> components/common/paginator pagination.category}}
+
+<script>
+    // Attaching Event Listener to "Add All To Cart"
+    document.getElementById("addAllToCart").addEventListener("click", addAllToCart)
+
+    function addAllToCart() {
+        
+        const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
+        let promise = fetch(URL).then(res => res.json()).then(data => console.log(data))
+      
+        // Redirect User to Cart Page
+        window.location = "/cart.php";
+    }
+</script>
