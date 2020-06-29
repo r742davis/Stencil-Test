@@ -1,5 +1,4 @@
 {{> components/products/filter sort=pagination.category.sort}}
-
 <div class="popover-wrapper">
     <button 
         id="addAllToCart"
@@ -59,6 +58,19 @@
     // Get initial cart length and assign to variable
     // --------------------------------------------------------------
     let cartLength = 0;
+        
+    getCart('/api/storefront/carts')
+    .then(cart => {
+        console.log(cart)
+        cartLength = JSON.stringify(cart.length)
+        if(cartLength > 0) {
+            removeAllFromCartBtn.style.display = "block";
+        }
+    })
+    .catch(error => console.error(error));
+    
+
+    // Cart Functions
     function getCart(url) {
         return fetch(url, {
             method: "GET",
@@ -66,26 +78,58 @@
         })
         .then(response => response.json());
     };
-        
-    getCart('/api/storefront/carts')
-    .then(cart => {
-        cartLength = JSON.stringify(cart.length)
-        if(cartLength > 0) {
-            removeAllFromCartBtn.style.display = "block";
-        }
-        
-    })
-    .catch(error => console.error(error));
-    
+
+    function addCartItem(url, cartId, cartItems) {
+        return fetch(url + cartId + '/items', {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"},
+            body: JSON.stringify(cartItems),
+        })
+        .then(response => response.json());
+    };
+
+    function createCart(url, cartItems) {
+        return fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"},
+            body: JSON.stringify(cartItems),
+        })
+        .then(response => response.json());
+    };
 
     async function removeAllFromCart() {
         console.log(cartLength);
     }
 
     async function addAllToCart() {
+        // If cart does not exist, creates cart
+        // Else, getCart() to retrieve cart ID
+
+        // let lineItems = [];
+        const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
+        let promise = await fetch(URL)
+            .then(res => res.json())
+            .then(async function({data, meta}) {
+                for (let item of data) {
+                    console.log("Item:", item)
+                    await fetch(`https://co3ka8qjaf.execute-api.us-east-2.amazonaws.com/default/get-product-variants?product_id=${item.id}`)
+                        .then(res => res.json())
+                        .then(async function({data, meta}) {
+                                console.log("Variation:", data)
+                                for (let variant of data) {
+                                    await fetch(`https://stencil-test4.mybigcommerce.com/cart.php?action=add&sku=${variant.sku}`)
+                                    setTimeout(100);
+                                }
+                                
+                        })
+                }
+                
+            });
         
-        // const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
-        // let promise = await fetch(URL).then(res => res.json()).then(data => console.log(data))
 
         // Notify the user that all products have been added to the cart
         // --------------------------------------------------------------
