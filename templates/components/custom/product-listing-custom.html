@@ -1,25 +1,31 @@
 {{> components/products/filter sort=pagination.category.sort}}
-<div class="popover-wrapper">
-    <button 
-        id="addAllToCart"
-        class="button button--primary" 
-        type="submit"
-        data-wait-message="Adding all items from {{category.name}} to cart..." 
-        >Add All To Cart
-    </button>
-    <div id="popover" class="popover-content">
-        <p id="popover-message" class="popover-message">You have added all items to your cart!</p>
+
+<div class="cart-buttons-wrapper">
+    <div class="popover-wrapper">
+        <button 
+            id="addAllToCart"
+            class="button button--primary" 
+            type="submit"
+            data-wait-message="Adding all items from {{category.name}} to cart..." 
+            >Add All To Cart
+        </button>
+        <div id="popover" class="popover-content">
+            <p id="popover-message" class="popover-message">You have added all items to your cart!</p>
+        </div>
+    </div>
+    <div class="popover-wrapper">
+        <button 
+            id="removeAllFromCart"
+            class="button button--primary remove-cart" 
+            type="submit"
+            data-wait-message="Removing all items from cart..." 
+            >Remove All From Cart
+        </button>
+        <div id="success-message" class="success-message">
+            <p>All Items Have Been Removed From Cart</p>
+        </div>
     </div>
 </div>
-
-    <button 
-        id="removeAllFromCart"
-        class="button button--primary remove-cart" 
-        type="submit"
-        data-wait-message="Removing all items from cart..." 
-        >Remove All From Cart
-    </button>
-
 
 <form 
     action="{{urls.compare}}" 
@@ -49,107 +55,121 @@
     // Attaching event listeners for:
     // - ADD ALL TO CART button
     // - REMOVE ALL FROM CART button
+    // - SUCCESS MESSAGE after removal of items from cart
     // --------------------------------------------------------------
     const addAllToCartBtn = document.getElementById("addAllToCart");
     const removeAllFromCartBtn = document.getElementById('removeAllFromCart');
+    const successMessage = document.getElementById('success-message');
     addAllToCartBtn.addEventListener("click", addAllToCart);
-    addAllToCartBtn.addEventListener("click", removeAllFromCart);
+    removeAllFromCartBtn.addEventListener("click", removeAllFromCart);
 
     // Get initial cart length and assign to variable
     // --------------------------------------------------------------
     let cartLength = 0;
-        
-    getCart('/api/storefront/carts')
-    .then(cart => {
-        console.log(cart)
-        cartLength = JSON.stringify(cart.length)
-        if(cartLength > 0) {
-            removeAllFromCartBtn.style.display = "block";
-        }
-    })
-    .catch(error => console.error(error));
-    
+    const cartAPI = '/api/storefront/carts/';
+    checkCartLength();
 
     // Cart Functions
+    // --------------------------------------------------------------
     function getCart(url) {
         return fetch(url, {
             method: "GET",
             credentials: "same-origin"
         })
-        .then(response => response.json());
+        .then(response => response.json())
     };
 
-    function addCartItem(url, cartId, cartItems) {
-        return fetch(url + cartId + '/items', {
-            method: "POST",
+    function deleteCart(url, cartId) {
+        return fetch(url + cartId, {
+            method: "DELETE",
             credentials: "same-origin",
             headers: {
-                "Content-Type": "application/json"},
-            body: JSON.stringify(cartItems),
+                "Content-Type": "application/json",}
         })
-        .then(response => response.json());
     };
 
-    function createCart(url, cartItems) {
-        return fetch(url, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"},
-            body: JSON.stringify(cartItems),
+    function checkCartLength() {
+        getCart(cartAPI)
+        .then(cart => {
+            cartLength = cart.length;
+            if(cartLength > 0) {
+                removeAllFromCartBtn.style.display = "block";
+            } else {
+                removeAllFromCartBtn.style.display = "none";
+            }
         })
-        .then(response => response.json());
-    };
+        .catch(error => console.error(error));
+    }
 
-    async function removeAllFromCart() {
-        console.log(cartLength);
+    function removeAllFromCart() {
+        getCart(cartAPI)
+        .then(cart => {
+            const id = cart[0].id.toString();
+            console.log(id);
+            deleteCart(cartAPI, id)
+            .then(data => console.log(data))
+            .then(() => {
+                cartLength = 0;
+                checkCartLength();
+            })
+            .then(() => {
+                setTimeout(() => addPopover(successMessage), 1000);
+                setTimeout(() => removePopover(successMessage), 7000);
+            })
+            .catch(error => console.log(error))
+        })
+    }
+
+    async function getProductVariants(id) {
+        await fetch(`https://co3ka8qjaf.execute-api.us-east-2.amazonaws.com/default/get-product-variants?product_id=${id}`)
+        .then(res => res.json())
+        .then(async function({data, meta}) {
+            for (let variant of data) {
+                await fetch(`https://stencil-test4.mybigcommerce.com/cart.php?action=add&sku=${variant.sku}`)
+                setTimeout(50);
+            }
+        })
     }
 
     async function addAllToCart() {
-        // If cart does not exist, creates cart
-        // Else, getCart() to retrieve cart ID
-
-        // let lineItems = [];
         const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
         let promise = await fetch(URL)
-            .then(res => res.json())
-            .then(async function({data, meta}) {
-                for (let item of data) {
-                    console.log("Item:", item)
-                    await fetch(`https://co3ka8qjaf.execute-api.us-east-2.amazonaws.com/default/get-product-variants?product_id=${item.id}`)
-                        .then(res => res.json())
-                        .then(async function({data, meta}) {
-                                console.log("Variation:", data)
-                                for (let variant of data) {
-                                    await fetch(`https://stencil-test4.mybigcommerce.com/cart.php?action=add&sku=${variant.sku}`)
-                                    setTimeout(100);
-                                }
-                                
-                        })
-                }
-                
-            });
-        
+        .then(res => res.json())
+        .then(async function({data, meta}) {
+            addAllToCartBtn.innerText = "Adding...";
+            for (let item of data) {
+                await getProductVariants(item.id)
+            };
+        })
+        .then(() => checkCartLength())
+        .then(() => addAllToCartBtn.innerText = "Add All To Cart")
+        .then(() => popoverNotification());
+    };
 
-        // Notify the user that all products have been added to the cart
-        // --------------------------------------------------------------
+    // Notify the user that all products have been added to the cart
+    // --------------------------------------------------------------
+    function popoverNotification() {
         const popoverMessage = document.getElementById('popover-message');
         const popover = document.getElementById('popover');
-        popover.style.display = "block";
-        popover.style.opacity = "1";
-        popoverMessage.style.display = "block";
-        popoverMessage.style.opacity = "1";
-
-        setTimeout(removePopover, 5000);
+        addPopover(popover);
+        addPopover(popoverMessage);
 
         // Remove popover after 5 seconds
         // --------------------------------------------------------------
-        function removePopover() {
-            popover.style.display = "none";
-            popover.style.opacity = "0";
-            popoverMessage.style.display = "none";
-            popoverMessage.style.opacity = "0";
+        setTimeout(timoutMessages, 5000);
+        function timoutMessages() {
+            removePopover(popover);
+            removePopover(popoverMessage);
         }
+    };
 
-    }
+    function removePopover(element) {
+        element.style.display = "none";
+        element.style.opacity = "0";
+    };
+
+    function addPopover(element) {
+        element.style.display = "block";
+        element.style.opacity = "1";
+    };
 </script>

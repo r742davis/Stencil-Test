@@ -4,6 +4,7 @@
 .popover-wrapper {
     position: relative;
     display: inline-block;
+    margin-right: 1rem;
 }
 
 .popover-content {
@@ -19,8 +20,6 @@
     top: 35px;
     width: auto;
     text-align: center;
-    display: flex;
-    align-items: center;
 }
 
 .popover-content::before {
@@ -45,3 +44,26 @@
 .remove-cart {
     display: none;
 }
+
+.cart-buttons-wrapper {
+    display: flex;
+}
+
+.success-message {
+    opacity: 0;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    width: auto;
+    background-color: $color-successLight;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    
+    p {
+        margin-bottom: 0;
+        width: 300px;
+        padding: 0.7rem;
+    }
+}
+
+
