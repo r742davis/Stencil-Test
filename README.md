@@ -2,7 +2,7 @@
 Stencil Test for oBundle Interview Project
 
 ### Demo Links
-- URL: https://stencil-test4.mybigcommerce.com/special-items/
+- URL: https://stencil-test4.mybigcommerce.com/
 - Preview Code: twqdu1cwzf
 
 ### Brief Description
