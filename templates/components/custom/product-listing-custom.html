@@ -1,12 +1,26 @@
 {{> components/products/filter sort=pagination.category.sort}}
 
+<div class="popover-wrapper">
+    <button 
+        id="addAllToCart"
+        class="button button--primary" 
+        type="submit"
+        data-wait-message="Adding all items from {{category.name}} to cart..." 
+        >Add All To Cart
+    </button>
+    <div id="popover" class="popover-content">
+        <p id="popover-message" class="popover-message">You have added all items to your cart!</p>
+    </div>
+</div>
 
-<button 
-    id="addAllToCart"
-    class="button button--primary" 
-    type="submit"
-    data-wait-message="Adding all items from {{category.name}} to cart..." 
-    >Add All To Cart</button>
+    <button 
+        id="removeAllFromCart"
+        class="button button--primary remove-cart" 
+        type="submit"
+        data-wait-message="Removing all items from cart..." 
+        >Remove All From Cart
+    </button>
+
 
 <form 
     action="{{urls.compare}}" 
@@ -33,15 +47,65 @@
 {{> components/common/paginator pagination.category}}
 
 <script>
-    // Attaching Event Listener to "Add All To Cart"
-    document.getElementById("addAllToCart").addEventListener("click", addAllToCart)
+    // Attaching event listeners for:
+    // - ADD ALL TO CART button
+    // - REMOVE ALL FROM CART button
+    // --------------------------------------------------------------
+    const addAllToCartBtn = document.getElementById("addAllToCart");
+    const removeAllFromCartBtn = document.getElementById('removeAllFromCart');
+    addAllToCartBtn.addEventListener("click", addAllToCart);
+    addAllToCartBtn.addEventListener("click", removeAllFromCart);
 
-    function addAllToCart() {
+    // Get initial cart length and assign to variable
+    // --------------------------------------------------------------
+    let cartLength = 0;
+    function getCart(url) {
+        return fetch(url, {
+            method: "GET",
+            credentials: "same-origin"
+        })
+        .then(response => response.json());
+    };
         
-        const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
-        let promise = fetch(URL).then(res => res.json()).then(data => console.log(data))
-      
-        // Redirect User to Cart Page
-        window.location = "/cart.php";
+    getCart('/api/storefront/carts')
+    .then(cart => {
+        cartLength = JSON.stringify(cart.length)
+        if(cartLength > 0) {
+            removeAllFromCartBtn.style.display = "block";
+        }
+        
+    })
+    .catch(error => console.error(error));
+    
+
+    async function removeAllFromCart() {
+        console.log(cartLength);
+    }
+
+    async function addAllToCart() {
+        
+        // const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
+        // let promise = await fetch(URL).then(res => res.json()).then(data => console.log(data))
+
+        // Notify the user that all products have been added to the cart
+        // --------------------------------------------------------------
+        const popoverMessage = document.getElementById('popover-message');
+        const popover = document.getElementById('popover');
+        popover.style.display = "block";
+        popover.style.opacity = "1";
+        popoverMessage.style.display = "block";
+        popoverMessage.style.opacity = "1";
+
+        setTimeout(removePopover, 5000);
+
+        // Remove popover after 5 seconds
+        // --------------------------------------------------------------
+        function removePopover() {
+            popover.style.display = "none";
+            popover.style.opacity = "0";
+            popoverMessage.style.display = "none";
+            popoverMessage.style.opacity = "0";
+        }
+
     }
 </script>
