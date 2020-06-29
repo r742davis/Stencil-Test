@@ -14,6 +14,14 @@
         <span class="mobileMenu-toggleIcon">Toggle menu</span>
     </a>
     {{> components/common/navigation}}
+    <div class="customer-header">
+        <h1>Hello, {{customer.name}}!</h1>
+        <h4>You have {{customer.store_credit.formatted}} in store credit!</h4>
+        <p>
+            Sign up today with your email for our exciting newsletter: 
+            <button>{{customer.email}}</button>
+        </p>
+    </div>
 
     {{#if page_type '===' 'default'}}
         <h1 class="header-logo header-logo--{{theme_settings.logo-position}}">

@@ -7,10 +7,10 @@
             class="button button--primary" 
             type="submit"
             data-wait-message="Adding all items from {{category.name}} to cart..." 
-            >Add All To Cart
+            >{{lang 'custom-phrases.add_all_to_cart'}}
         </button>
         <div id="popover" class="popover-content">
-            <p id="popover-message" class="popover-message">You have added all items to your cart!</p>
+            <p id="popover-message" class="popover-message">{{lang 'custom-phrases.popover_message'}}</p>
         </div>
     </div>
     <div class="popover-wrapper">
@@ -19,10 +19,10 @@
             class="button button--primary remove-cart" 
             type="submit"
             data-wait-message="Removing all items from cart..." 
-            >Remove All From Cart
+            >{{lang 'custom-phrases.remove_all_from_cart'}}
         </button>
         <div id="success-message" class="success-message">
-            <p>All Items Have Been Removed From Cart</p>
+            <p>{{lang 'custom-phrases.success_message'}}</p>
         </div>
     </div>
 </div>
@@ -149,8 +149,8 @@
     // Notify the user that all products have been added to the cart
     // --------------------------------------------------------------
     function popoverNotification() {
-        const popoverMessage = document.getElementById('popover-message');
         const popover = document.getElementById('popover');
+        const popoverMessage = document.getElementById('popover-message');
         addPopover(popover);
         addPopover(popoverMessage);
 
