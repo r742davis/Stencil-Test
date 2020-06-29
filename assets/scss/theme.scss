@@ -83,3 +83,11 @@
 @import "layouts/layouts"; // 1
 
 @import "vendor/jstree/style";
+
+// Custom SCSS Importing
+// -----------------------------------------------------------------------------
+//
+// 1. Custom designs for Special Items in Stencil-Test store
+//
+// -----------------------------------------------------------------------------
+@import "custom/_custom.scss";

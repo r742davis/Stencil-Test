@@ -1,0 +1,175 @@
+{{> components/products/filter sort=pagination.category.sort}}
+
+<div class="cart-buttons-wrapper">
+    <div class="popover-wrapper">
+        <button 
+            id="addAllToCart"
+            class="button button--primary" 
+            type="submit"
+            data-wait-message="Adding all items from {{category.name}} to cart..." 
+            >{{lang 'custom-phrases.add_all_to_cart'}}
+        </button>
+        <div id="popover" class="popover-content">
+            <p id="popover-message" class="popover-message">{{lang 'custom-phrases.popover_message'}}</p>
+        </div>
+    </div>
+    <div class="popover-wrapper">
+        <button 
+            id="removeAllFromCart"
+            class="button button--primary remove-cart" 
+            type="submit"
+            data-wait-message="Removing all items from cart..." 
+            >{{lang 'custom-phrases.remove_all_from_cart'}}
+        </button>
+        <div id="success-message" class="success-message">
+            <p>{{lang 'custom-phrases.success_message'}}</p>
+        </div>
+    </div>
+</div>
+
+<form 
+    action="{{urls.compare}}" 
+    method='POST' 
+    {{#if settings.data_tag_enabled}} 
+        data-list-name="Category: {{category.name}}" 
+    {{/if}} 
+    data-product-compare>
+    {{#if theme_settings.product_list_display_mode '===' 'grid'}}
+        {{#if settings.data_tag_enabled}}
+            {{> components/products/grid products=category.products show_compare=category.show_compare theme_settings=theme_settings event="list" }}
+        {{else}}
+            {{> components/products/grid products=category.products show_compare=category.show_compare theme_settings=theme_settings}}
+        {{/if}}
+    {{else}}
+        {{#if settings.data_tag_enabled}}
+            {{> components/products/list products=category.products show_compare=category.show_compare theme_settings=theme_settings event="list" }}
+        {{else}}
+            {{> components/products/list products=category.products show_compare=category.show_compare theme_settings=theme_settings}}
+        {{/if}}
+    {{/if}}
+</form>
+
+{{> components/common/paginator pagination.category}}
+
+<script>
+    // Attaching event listeners for:
+    // - ADD ALL TO CART button
+    // - REMOVE ALL FROM CART button
+    // - SUCCESS MESSAGE after removal of items from cart
+    // --------------------------------------------------------------
+    const addAllToCartBtn = document.getElementById("addAllToCart");
+    const removeAllFromCartBtn = document.getElementById('removeAllFromCart');
+    const successMessage = document.getElementById('success-message');
+    addAllToCartBtn.addEventListener("click", addAllToCart);
+    removeAllFromCartBtn.addEventListener("click", removeAllFromCart);
+
+    // Get initial cart length and assign to variable
+    // --------------------------------------------------------------
+    let cartLength = 0;
+    const cartAPI = '/api/storefront/carts/';
+    checkCartLength();
+
+    // Cart Functions
+    // --------------------------------------------------------------
+    function getCart(url) {
+        return fetch(url, {
+            method: "GET",
+            credentials: "same-origin"
+        })
+        .then(response => response.json())
+    };
+
+    function deleteCart(url, cartId) {
+        return fetch(url + cartId, {
+            method: "DELETE",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",}
+        })
+    };
+
+    function checkCartLength() {
+        getCart(cartAPI)
+        .then(cart => {
+            cartLength = cart.length;
+            if(cartLength > 0) {
+                removeAllFromCartBtn.style.display = "block";
+            } else {
+                removeAllFromCartBtn.style.display = "none";
+            }
+        })
+        .catch(error => console.error(error));
+    }
+
+    function removeAllFromCart() {
+        getCart(cartAPI)
+        .then(cart => {
+            const id = cart[0].id.toString();
+            console.log(id);
+            deleteCart(cartAPI, id)
+            .then(data => console.log(data))
+            .then(() => {
+                cartLength = 0;
+                checkCartLength();
+            })
+            .then(() => {
+                setTimeout(() => addPopover(successMessage), 1000);
+                setTimeout(() => removePopover(successMessage), 7000);
+            })
+            .catch(error => console.log(error))
+        })
+    }
+
+    async function getProductVariants(id) {
+        await fetch(`https://co3ka8qjaf.execute-api.us-east-2.amazonaws.com/default/get-product-variants?product_id=${id}`)
+        .then(res => res.json())
+        .then(async function({data, meta}) {
+            for (let variant of data) {
+                await fetch(`https://stencil-test4.mybigcommerce.com/cart.php?action=add&sku=${variant.sku}`)
+                setTimeout(50);
+            }
+        })
+    }
+
+    async function addAllToCart() {
+        const URL = 'https://mtdfvby01f.execute-api.us-east-2.amazonaws.com/default/get-category-products?category_id={{category.id}}';
+        let promise = await fetch(URL)
+        .then(res => res.json())
+        .then(async function({data, meta}) {
+            addAllToCartBtn.innerText = "Adding...";
+            for (let item of data) {
+                await getProductVariants(item.id)
+            };
+        })
+        .then(() => checkCartLength())
+        .then(() => addAllToCartBtn.innerText = "Add All To Cart")
+        .then(() => popoverNotification());
+    };
+
+    // Notify the user that all products have been added to the cart
+    // --------------------------------------------------------------
+    function popoverNotification() {
+        const popover = document.getElementById('popover');
+        const popoverMessage = document.getElementById('popover-message');
+        addPopover(popover);
+        addPopover(popoverMessage);
+
+        // Remove popover after 5 seconds
+        // --------------------------------------------------------------
+        setTimeout(timoutMessages, 5000);
+        function timoutMessages() {
+            removePopover(popover);
+            removePopover(popoverMessage);
+        }
+    };
+
+    function removePopover(element) {
+        element.style.display = "none";
+        element.style.opacity = "0";
+    };
+
+    function addPopover(element) {
+        element.style.display = "block";
+        element.style.opacity = "1";
+    };
+</script>

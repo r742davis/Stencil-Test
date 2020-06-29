@@ -1,0 +1,82 @@
+// Popover Notification Effect for "Add All to Cart" Button
+// -----------------------------------------------------------------------------
+
+.popover-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.popover-content {
+    z-index: 10;
+    display: none;
+    opacity: 0;
+    transform: translate(0, 10px);
+    transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+    position: absolute;
+    background-color: $color-warningLight;
+    padding: 1rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    top: 35px;
+    width: auto;
+    text-align: center;
+}
+
+.popover-content::before {
+    position: absolute;
+    z-index: -1;
+    content: "";
+    right: calc(50% - 10px);
+    top: -8px;
+    border-style: solid;
+    border-width: 0 10px 10px 10px;
+    border-color: transparent transparent $color-warningLight transparent;
+    transition-duration: 0.3s;
+    transition-property: transform;
+}
+
+.popover-message {
+    display: none;
+    opacity: 0;
+    margin-bottom: 0;
+}
+
+.remove-cart {
+    display: none;
+}
+
+.cart-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.success-message {
+    opacity: 0;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    width: auto;
+    background-color: $color-successLight;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    
+    p {
+        margin-bottom: 0;
+        width: 400px;
+        padding: 0.7rem;
+    }
+}
+
+// Customer Header Stylings
+// -----------------------------------------------------------------------------
+.customer-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #A3C1C2;
+    
+    h1 {
+        color: $color-white;
+    }
+}
+

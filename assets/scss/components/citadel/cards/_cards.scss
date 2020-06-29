@@ -20,6 +20,12 @@
         // scss-lint:disable NestingDepth
         .card-figcaption {
             opacity: 1;
+            -webkit-animation: jello-horizontal 0.5s both;
+                    animation: jello-horizontal 0.5s both;
+
+        }
+        .card-image-hover {
+            opacity: 1;
         }
     }
 }
@@ -46,7 +52,8 @@
     transform: translate3d(0, -50%, 0); // 2
 }
 
-.card-image {
+.card-image,
+.card-image-hover {
     @include lazy-loaded-img;
     border: 0;
     width: 100%;
@@ -85,6 +92,7 @@
     border: $card-figcaption-button-border;
     display: $card-figcaption-button-display;
     margin: $card-figcaption-button-margin;
+    opacity: 0.75;
 
     &:active {
         background-color: $card-figcaption-button-backgroundHover;
@@ -142,3 +150,76 @@
         }
     }
 }
+
+// Hover Effect for Card Images on Product Display
+// -----------------------------------------------------------------------------
+
+.card-image-hover {
+    opacity: 0;
+    height: auto;
+    transition: opacity 0.5s ease;
+}
+
+// Quick View Animation
+// -----------------------------------------------------------------------------
+ @-webkit-keyframes jello-horizontal {
+    0% {
+      -webkit-transform: scale3d(1, 1, 1);
+              transform: scale3d(1, 1, 1);
+    }
+    30% {
+      -webkit-transform: scale3d(1.25, 0.75, 1);
+              transform: scale3d(1.25, 0.75, 1);
+    }
+    40% {
+      -webkit-transform: scale3d(0.75, 1.25, 1);
+              transform: scale3d(0.75, 1.25, 1);
+    }
+    50% {
+      -webkit-transform: scale3d(1.15, 0.85, 1);
+              transform: scale3d(1.15, 0.85, 1);
+    }
+    65% {
+      -webkit-transform: scale3d(0.95, 1.05, 1);
+              transform: scale3d(0.95, 1.05, 1);
+    }
+    75% {
+      -webkit-transform: scale3d(1.05, 0.95, 1);
+              transform: scale3d(1.05, 0.95, 1);
+    }
+    100% {
+      -webkit-transform: scale3d(1, 1, 1);
+              transform: scale3d(1, 1, 1);
+    }
+  }
+  @keyframes jello-horizontal {
+    0% {
+      -webkit-transform: scale3d(1, 1, 1);
+              transform: scale3d(1, 1, 1);
+    }
+    30% {
+      -webkit-transform: scale3d(1.25, 0.75, 1);
+              transform: scale3d(1.25, 0.75, 1);
+    }
+    40% {
+      -webkit-transform: scale3d(0.75, 1.25, 1);
+              transform: scale3d(0.75, 1.25, 1);
+    }
+    50% {
+      -webkit-transform: scale3d(1.15, 0.85, 1);
+              transform: scale3d(1.15, 0.85, 1);
+    }
+    65% {
+      -webkit-transform: scale3d(0.95, 1.05, 1);
+              transform: scale3d(0.95, 1.05, 1);
+    }
+    75% {
+      -webkit-transform: scale3d(1.05, 0.95, 1);
+              transform: scale3d(1.05, 0.95, 1);
+    }
+    100% {
+      -webkit-transform: scale3d(1, 1, 1);
+              transform: scale3d(1, 1, 1);
+    }
+  }
+  

@@ -111,6 +111,7 @@
     "fontSize-h5": 15,
     "fontSize-h6": 13,
     "applePay-button": "black",
+    "color-customerHeader": "#A3C1C2",
     "color-textBase": "#333333",
     "color-textBase--hover": "#757575",
     "color-textBase--active": "#757575",
